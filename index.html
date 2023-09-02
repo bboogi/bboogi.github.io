@@ -42,9 +42,11 @@
             clearTimeout(finish_timer);
             finish_timer = setTimeout(function() {
                 let strings = '시청하신 영상에 대한 피험자의 "집중도"를 평가하시오\n\n' +'    (1) 매우 낮음 (2) 낮음 (3) 높음 (4) 매우 높음 \n\n'
-                let result = prompt(strings, '예시) 4');
+                let inputResult = prompt(strings, '예시) 4');
 
-                if (result) {
+                if (inputResult !== null) {
+                    // Prompt에서 취소 버튼을 누르지 않은 경우
+                    let result = inputResult;
                     check = true;
                     previous = false;
                     Previous = previous;
@@ -55,18 +57,24 @@
                     } else {
                         cnt++;
                         next_video = ".\\" + cnt + ".mp4";
+                        // next_video = ".\\LHS\\A\\" + cnt + ".mp4"
                         const currentTime = new Date().toLocaleString();
                         resultList.push({ concentration: result, time: currentTime });
                     }
                     addVideo();
                 }
+                // Prompt에서 취소 버튼을 누른 경우에는 아무 작업도 하지 않음.
             }, 500);
         }
 
         let prev_video; 
+        let currentVideo; // 현재 동영상을 저장하기 위한 변수
         
         function addVideo() {
             const video = document.createElement("video");
+            video.autoplay = true;
+            video.muted = true; // 음소거 설정
+            currentVideo = video; // 현재 동영상 저장
            
             if (check == true && Previous == false){
                 video.src = next_video;
@@ -74,12 +82,13 @@
             } else if(check != true && Previous == false){
                 video.src = ".\\" + cnt + ".mp4";
                 prev_video = ".\\" + cnt + ".mp4";
+
+                // video.src = ".\\LHS\\A\\" + 1 + ".mp4";
+                // prev_video= ".\\LHS\\A\\" + 1 + ".mp4";
             } else if(check == true && Previous == true){
                 video.src = prev_video;
             }
             
-            video.controls = true;
-
             const videoContainer = document.getElementById("video");
             while (videoContainer.firstChild) {
                 videoContainer.removeChild(videoContainer.firstChild);
@@ -87,7 +96,6 @@
 
             videoContainer.appendChild(video);
 
-            video.play();
             video.onended = videoEnded;
 
             const videoNameElement = document.getElementById('video_name');
@@ -111,6 +119,13 @@
             XLSX.writeFile(wb, "survey_data.xlsx");
         }
 
+        function replayVideo() {
+            if (currentVideo) {
+                currentVideo.currentTime = 0; // 현재 동영상을 처음부터 재생
+                currentVideo.play();
+            }
+        }
+
         window.onload = addVideo;
         
     </script>
@@ -123,10 +138,14 @@
     <p id="video_name"></p>
     
     <div id="video"></div>
+  
+    <button onclick="replayVideo()">동영상 다시보기</button>
     <br>
+    <hr>
     <h5>*확인 버튼 클릭시, 다음 동영상으로 넘어갑니다*</h5>
-    <h5>*취소 버튼 클릭시, 동영상 시청 후 설문 다시 진행*</h5>
-   
+    
+    <br>
+    <hr width = "100%" color = "gray" size = "0.5">
     <p>주석 결과</p>
     <p id="result_list"></p>
     <button onclick="saveToExcel(resultList)">Save to Excel</button>
