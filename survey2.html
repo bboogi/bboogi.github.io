@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 5% 0;
+        }
+
+        video {
+            max-width: 60%;
+            height: auto;
+            display: block; 
+            margin: 20px auto;
+        }
+
+        h5 {
+            margin: 0;
+            padding: 0;
+            color: black;
+        }
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+
+    <script>
+        let result;
+        let finish_timer;
+        let next_video;
+        let check = false;
+        let cnt = 1;
+        let Previous = false;
+
+        let resultList = [];
+
+        function videoEnded(previous) {
+            clearTimeout(finish_timer);
+            finish_timer = setTimeout(function() {
+                let strings = '시청하신 영상에 대한 피험자의 "집중도"를 평가하시오\n\n' +'    (1) 매우 낮음 (2) 낮음 (3) 높음 (4) 매우 높음 \n\n'
+                let result = prompt(strings, '예시) 4');
+
+                if (result) {
+                    check = true;
+                    previous = false;
+                    Previous = previous;
+                    if (result !== '1' && result !== '2' && result !== '3' && result !== '4') {
+                        alert('올바른 값을 입력하시오');
+                        previous = true;
+                        Previous = previous;
+                    } else {
+                        cnt++;
+                        next_video = ".\\" + cnt + ".mp4";
+                        const currentTime = new Date().toLocaleString();
+                        resultList.push({ concentration: result, time: currentTime });
+                    }
+                    addVideo();
+                }
+            }, 500);
+        }
+
+        let prev_video; 
+        
+        function addVideo() {
+            const video = document.createElement("video");
+           
+            if (check == true && Previous == false){
+                video.src = next_video;
+                prev_video = video.src;
+            } else if(check != true && Previous == false){
+                video.src = ".\\" + cnt + ".mp4";
+                prev_video = ".\\" + cnt + ".mp4";
+            } else if(check == true && Previous == true){
+                video.src = prev_video;
+            }
+            
+            video.controls = true;
+
+            const videoContainer = document.getElementById("video");
+            while (videoContainer.firstChild) {
+                videoContainer.removeChild(videoContainer.firstChild);
+            }
+
+            videoContainer.appendChild(video);
+
+            video.play();
+            video.onended = videoEnded;
+
+            const videoNameElement = document.getElementById('video_name');
+            videoNameElement.textContent = '현재 동영상 경로: ' + video.src;
+
+            const results = document.getElementById('result_list');
+            results.innerHTML = ''; // 이전 결과 초기화
+            for (const item of resultList) {
+                results.innerHTML += `집중도: ${item.concentration}, 시간: ${item.time}<br>`;
+            }
+        }
+
+        function saveToExcel(resultList) {
+            const data = resultList.map(item => [item.concentration, item.time]);
+
+            const ws = XLSX.utils.aoa_to_sheet([['집중도', '시간']]);
+            XLSX.utils.sheet_add_aoa(ws, data, { origin: -1 });
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Survey Data");
+            XLSX.writeFile(wb, "survey_data.xlsx");
+        }
+
+        window.onload = addVideo;
+        
+    </script>
+</head>
+<body>
+    
+    <h1>GT_수집 집중도 평가</h1>
+    <br>
+    
+    <p id="video_name"></p>
+    
+    <div id="video"></div>
+    <br>
+    <h5>*확인 버튼 클릭시, 다음 동영상으로 넘어갑니다*</h5>
+    <h5>*취소 버튼 클릭시, 동영상 시청 후 설문 다시 진행*</h5>
+   
+    <p>주석 결과</p>
+    <p id="result_list"></p>
+    <button onclick="saveToExcel(resultList)">Save to Excel</button>
+</body>
+</html>
