@@ -8,21 +8,78 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            margin: 0;
-            padding: 5% 0;
+            margin: 0 ;
+            padding: 0;
+          
         }
 
         video {
-            max-width: 60%;
+            max-width: 50%;
             height: auto;
             display: block; 
             margin: 20px auto;
+            border: 2px solid gainsboro; /* 테두리 스타일 추가 */
+            border-radius: 10px; /* 테두리 둥글게 만들기 */
+
+        }
+
+        #video{
+            outline: #ccc;
+            border: 10px;
         }
 
         h5 {
             margin: 0;
             padding: 0;
             color: black;
+        }
+
+        h2 {
+            text-decoration: underline;
+        }
+
+        #progress_bar_container {
+            width: 40%;
+            text-align: center;
+            margin-top: 0px;
+        }
+
+        #progress_bar {
+            width: 100%;
+            background-color: #ccc;
+            height: 20px;
+            position: relative;
+        }
+
+        #progress_fill {
+            height: 100%;
+            width: 0;
+            background-color: #4CAF50;
+            position: absolute;
+            transition: width 0.5s ease-in-out;
+        }
+
+        #total {
+           color: darkslateblue; 
+           font-size: larger;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px; /* 버튼 패딩 크기 조절 */
+            cursor: pointer;
+            margin: 10px;
+            font-size: 18px; /* 버튼 폰트 크기 조절 */
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #video_name{
+            color:darkgrey;
+            font-size: 5px;
         }
 
     </style>
@@ -36,13 +93,39 @@
         let cnt = 1;
         let Previous = false;
 
+        let video_path;
         let resultList = [];
+        let annotatorName = ''; // 주석자 이름을 저장할 변수
+        let finish = false
+        //===========check===============
+        let TOTAL_VIDEO_NUMBER = 4;
+        let folder = 'timer';
+        let PASSWORD = '0000'
+        // 초기에 프로그래스 바 표시
+        updateProgressBar();
 
+        //=================== 주석자 정보 입력 ====================
+        let password = prompt('공유 받은 비밀번호를 입력하시오', '****')
+
+        if(password != '0000' ){
+            alert('올바르지 않은 비밀번호입니다.');
+            document.body.style.display = 'none'; // 페이지를 숨깁니다.
+        }else{
+           
+        }
+
+        while (!annotatorName) {
+            annotatorName = prompt('주석자 본인 이름을 입력하시오', 'ex) 홍길동');
+        }
+
+
+
+        //=================== 비디오 끝나면 팝업창으로 설문조사 ==================
         function videoEnded(previous) {
             clearTimeout(finish_timer);
             finish_timer = setTimeout(function() {
                 let strings = '시청하신 영상에 대한 피험자의 "집중도"를 평가하시오\n\n' +'    (1) 매우 낮음 (2) 낮음 (3) 높음 (4) 매우 높음 \n\n'
-                let inputResult = prompt(strings, '예시) 4');
+                let inputResult = prompt(strings, 'ex) 4');
 
                 if (inputResult !== null) {
                     // Prompt에서 취소 버튼을 누르지 않은 경우
@@ -50,51 +133,88 @@
                     check = true;
                     previous = false;
                     Previous = previous;
+
                     if (result !== '1' && result !== '2' && result !== '3' && result !== '4') {
                         alert('올바른 값을 입력하시오');
                         previous = true;
                         Previous = previous;
                     } else {
+                        if (cnt == TOTAL_VIDEO_NUMBER){
+                            showCompletionMessage();
+                        }
+
+                        updateProgressBar();
                         cnt++;
-                        next_video = ".\\" + cnt + ".mp4";
-                        // next_video = ".\\LHS\\A\\" + cnt + ".mp4"
+                        next_video = ".\\" + folder + '\\' + cnt + ".mp4";
+                        //next_video = ".\\LHS\\A\\" + cnt + ".mp4"
+
+                        // 엑셀 파일 추가 데이터
+                        subject = video_path.substring(2,7)
+                        video_name = video_path.substring(8,)
                         const currentTime = new Date().toLocaleString();
-                        resultList.push({ concentration: result, time: currentTime });
+                        
+                        resultList.push({ subject_name: subject, video: video_name, concentration: result, time: currentTime });
+                        const total = document.getElementById("total");
+                        total.textContent = '주석 진행 상황 : ' + resultList.length + '/' + TOTAL_VIDEO_NUMBER
+                        // 업데이트된 프로그래스 바 표시
+                        
+                        //완료 메세지 보내기
+                        
+                       
                     }
                     addVideo();
                 }
                 // Prompt에서 취소 버튼을 누른 경우에는 아무 작업도 하지 않음.
             }, 500);
+
+           
+
+            // // 업데이트된 프로그래스 바 표시
+            // updateProgressBar();
         }
+
+        
+        if (finish) { // 주석이 60개 완료되면
+                          
+                        }
 
         let prev_video; 
         let currentVideo; // 현재 동영상을 저장하기 위한 변수
         
+        //================== 다음 동영상 ===================
         function addVideo() {
             const video = document.createElement("video");
             video.autoplay = true;
             video.muted = true; // 음소거 설정
             currentVideo = video; // 현재 동영상 저장
            
+
             if (check == true && Previous == false){
                 video.src = next_video;
                 prev_video = video.src;
-            } else if(check != true && Previous == false){
-                video.src = ".\\" + cnt + ".mp4";
-                prev_video = ".\\" + cnt + ".mp4";
+                video_path = next_video;
 
-                // video.src = ".\\LHS\\A\\" + 1 + ".mp4";
-                // prev_video= ".\\LHS\\A\\" + 1 + ".mp4";
+            } else if(check != true && Previous == false){
+                video.src = ".\\" + folder + '\\' + cnt + ".mp4";
+                prev_video = ".\\" + folder + '\\' + cnt + ".mp4";
+                video_path = ".\\" + folder + '\\' + cnt + ".mp4";
+
+                //video.src = ".\\LHS\\A\\" + 1 + ".mp4";
+                //prev_video= ".\\LHS\\A\\" + 1 + ".mp4";
+                //video_path = ".\\LHS\\A\\" + 1 + ".mp4";
+            
             } else if(check == true && Previous == true){
                 video.src = prev_video;
             }
             
+          
+            //----------html div 본래 아이템 삭제하고-----------------
             const videoContainer = document.getElementById("video");
             while (videoContainer.firstChild) {
                 videoContainer.removeChild(videoContainer.firstChild);
             }
-
             videoContainer.appendChild(video);
+            //-------------------------------------------------------
 
             video.onended = videoEnded;
 
@@ -104,21 +224,12 @@
             const results = document.getElementById('result_list');
             results.innerHTML = ''; // 이전 결과 초기화
             for (const item of resultList) {
-                results.innerHTML += `집중도: ${item.concentration}, 시간: ${item.time}<br>`;
+                results.innerHTML += `[피험자: ${item.subject_name}, 동영상: ${item.video}] 집중도: ${item.concentration}, 시간: ${item.time}<br>`;
             }
         }
 
-        function saveToExcel(resultList) {
-            const data = resultList.map(item => [item.concentration, item.time]);
 
-            const ws = XLSX.utils.aoa_to_sheet([['집중도', '시간']]);
-            XLSX.utils.sheet_add_aoa(ws, data, { origin: -1 });
-
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Survey Data");
-            XLSX.writeFile(wb, "survey_data.xlsx");
-        }
-
+        //================== 동영상 리플레이 =====================
         function replayVideo() {
             if (currentVideo) {
                 currentVideo.currentTime = 0; // 현재 동영상을 처음부터 재생
@@ -126,28 +237,102 @@
             }
         }
 
+      
+       // 함수 실행 시 프로그래스 바 업데이트
+        function updateProgressBar() {
+            const progressBar = document.getElementById("progress_fill");
+            if (progressBar) {
+                const progressPercentage = (cnt / TOTAL_VIDEO_NUMBER) * 100;
+                progressBar.style.width = progressPercentage + "%";
+            }
+        }
+
+   
+
+        // ==================== 엑셀 파일 저장 ====================
+        function saveToExcel(resultList) {
+            const data = resultList.map(item => [item.subject_name, item.video, item.concentration, item.time]);
+
+            const fileName = `주석결과_${annotatorName}.xlsx`;
+
+            const ws = XLSX.utils.aoa_to_sheet([['피험자', '동영상', '집중도', '시간']]);
+            XLSX.utils.sheet_add_aoa(ws, data, { origin: -1 });
+
+            // 워크시트 보호 설정 (선택사항)
+            const protectionOptions = {
+                selectLockedCells: true,
+                selectUnlockedCells: true,
+            };
+            ws['!protect'] = protectionOptions;
+
+            // 워크북 생성
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Survey Data");
+
+            // 암호 설정
+            const passwordOptions = { password: 'your_password_here' }; // 암호를 설정하려면 여기에 원하는 암호를 넣으세요.
+            XLSX.writeFile(wb, fileName, passwordOptions);
+        }
+
+       
+
+        // =====================주석이 완료되면 메시지========================
+        function showCompletionMessage() {
+            const completionMessage = document.getElementById("completion_message");
+            completionMessage.textContent = "주석이 완료되었습니다";
+            completionMessage.style.display = "block";
+
+            // 다른 요소 숨김
+            const progressBar = document.getElementById("progress_bar");
+            progressBar.style.display = "none";
+            const video_name_ = document.getElementById("video_name");
+            video_name_.style.display = "none";
+            const replay = document.getElementById('replay')
+            replay.style.display = "none";
+            const video_ = document.getElementById("video");
+            video_.style.display = "none";
+
+            // 엑셀 파일 저장 버튼을 표시
+            const saveButton = document.getElementById('save_button');
+            saveButton.style.display = "block";
+        }
+      
         window.onload = addVideo;
-        
+
     </script>
 </head>
 <body>
     
     <h1>GT_수집 집중도 평가</h1>
     <br>
+
+
+    <strong><p id="total">주석 진행 상황 : 0/4 </p></strong>
+    <div id="progress_bar_container">
+        <div id="progress_bar">
+            <div id="progress_fill"></div>
+        </div>
+    </div>
     
-    <p id="video_name"></p>
+    <strong><h1 id="completion_message"></h1></strong>
     
+
+    <p id="video_name"></p> 
     <div id="video"></div>
-  
-    <button onclick="replayVideo()">동영상 다시보기</button>
+    <button id ='replay' onclick="replayVideo()">동영상 다시보기</button>
     <br>
-    <hr>
-    <h5>*확인 버튼 클릭시, 다음 동영상으로 넘어갑니다*</h5>
     
+  
+    <!-- <h5>*확인 버튼 클릭시, 다음 동영상으로 넘어갑니다*</h5> -->
+    
+
     <br>
     <hr width = "100%" color = "gray" size = "0.5">
-    <p>주석 결과</p>
+    <h2>주석 결과</h2>
     <p id="result_list"></p>
-    <button onclick="saveToExcel(resultList)">Save to Excel</button>
+    
+    <button id="save_button" style="display: none;" onclick="saveToExcel(resultList)">Save to Excel</button>
+
+
 </body>
 </html>
