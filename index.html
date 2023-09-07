@@ -1,424 +1,463 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: auto;
-            margin: 0 ;
-            padding: 0; 
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-        video {
-            max-width: 50%;
-            height: auto;
-            display: block; 
-            margin: 20px auto;
-            border: 2px solid gainsboro; /* 테두리 스타일 추가 */
-            border-radius: 10px; /* 테두리 둥글게 만들기 */
-        }
-        #video{
-            outline: #ccc;
-            border: 10px;
-        }
-        h5 {
-            margin: 0;
-            padding: 0;
-            color: black;
-        }
-        #progress_bar_container {
-            width: 40%;
-            text-align: center;
-            margin-top: 0px;
-        }
-        #progress_bar {
-            width: 100%;
-            background-color: #ccc;
-            height: 20px;
-            position: relative;
-        }
+    <head>
+        <style>
+            body {background-color: #ed7e00; display: flex; flex-direction: column; align-items: center; justify-content: center; height: auto; margin: 0; padding: 0;}
+            header { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; height: auto; margin: 0;  padding: 0; background-color: white; box-shadow: 5px 5px 5px 5px gray; }      
+            main {  width: 100%;  height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; height: auto; margin: 0; padding: 0; background-color: #ed7e00;}
+            footer{ width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; height: auto; margin: 0; padding: 0; background-color: #ed7e00;}
+            #title {font-size: 35px; margin-top: 50px; text-align: center;}
+            #total {color: #ed8b00; font-size: larger; text-align: center;}
+            #progress_bar_container {width: 40%; text-align: center; margin-top: 0px;}
+            #video_name {color: darkgrey;font-size: 5px;text-align: center;}
+            form {display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;}
+            video {max-width: 50%; height: auto; display: block; margin: 20px auto; border: 2px solid gainsboro; border-radius: 10px; }
+            #video{outline: #ccc; border: 10px; background-color: #ed7e00; width: 100%; margin-top: 10px;}
+            h5 {margin: 0; padding: 0; color: black;}
+            #progress_bar_container {width: 40%; text-align: center; margin-top: 0px;}
+            #progress_bar {width: 100%; background-color: #ccc; height: 20px; position: relative;}
+            #progress_fill {height: 100%; width: 0; background-color: #eaaa00; position: absolute; transition: width 0.5s ease-in-out;}
+            button { width: 300px; background-color: #ed8b00; font-weight: bold; color:  white; border: none; padding: 15px 30px; cursor: pointer; margin: 10px; font-size: 18px;}
+            button:hover {background-color: #ed7e00; font-weight: bold;} 
+            
+            #video_name{color:darkgrey; font-size: 5px;}
+            #completion_message{margin: 100px; font-size: 60px;}
+            #completion_message2{color: #ed8b00; margin: 0; font-size: 30px;}
+            #completion_message3{color: #ed8b00; margin: 3px; font-size: 30px;}
+            textarea{width: 100px; border:none;}
+            .form-elements{display: flex; flex-direction: column; align-items: right; justify-content: right; text-align: right;}
+            fieldset{border: none;}
+            img{display: flex; flex-direction: column; align-items: right; justify-content: right; width: 200px; height: auto;}
+            #logo-container {position: absolute; top: 0; right: 0; padding: 10px;}
+            #logo {width: 150px; height: auto;}
+            #title {font-size: 35px; margin-top: 50px;}
+            #replay{background-color: white; color: #ed7e00; font-weight: bold;  width: 300px;}
+            #replay:hover {background-color:#333; color: white; font-weight: bold;}
+            #replay_btn{ width: 100%; height: auto;  font-weight: bold;  display: flex; flex-direction: column; align-items: center; justify-content: center; }
+            #replay_btn div{ width: 100%; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);}
+            #result_title{width: 100%; margin: 0; background-color: #ed7e00; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+            #result_list{width: 100%; margin-bottom: 10%; background-color: #ed7e00; color: white;display: flex; flex-direction: column; align-items: center; justify-content: center;}
+            #radio_container { display: flex; flex-direction: column; align-items: center;  justify-content: center; text-align: center; width: 100%;  background-color: #ed7e00;  color: white; margin-top: 20px; /* 간격 조정 */
+                padding: 15px 10px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+            #radio_container input[type="radio"] {display: none;}
+            #radio_btn:hover{background-color:#333; color: white; font-weight: bold;}
+            #radio_btn{background-color: white; color: #ed7e00; margin-top: 30px;width: 300px;}
+            #replay2 {background-color: white; color: #ed7e00; text-align: center; margin: 7px auto; width: 300px;}
+            #replay2:hover{background-color:#333; color: white; font-weight: bold;}
+            #radio_title {font-size: 30px; margin-top: 20px;margin-bottom: 10px;}
+            #radio_container label {display: inline-block; cursor: pointer; height: 30px; width: 200px; border: none; line-height: 24px; text-align: center; font-weight: bold; font-size: 28x;
+                background-color: #fff; color: #333; margin: 7px; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;}
+            #radio_container label:hover {background-color: #333; color: #fff;}
+            #radio_container input[type="radio"]:checked + label {background-color: #333; color: #fff; }
 
-        #progress_fill {
-            height: 100%;
-            width: 0;
-            background-color: #4CAF50;
-            position: absolute;
-            transition: width 0.5s ease-in-out;
-        }
-
-        #total {
-           color:  #4CAF50; 
-           font-size: larger;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 15px 30px; /* 버튼 패딩 크기 조절 */
-            cursor: pointer;
-            margin: 10px;
-            font-size: 18px; /* 버튼 폰트 크기 조절 */
-        }
-        button:hover {background-color: #45a049;}
-        #video_name{
-            color:darkgrey;
-            font-size: 5px;
-        }
-        #blank{margin: 15%;}
-        #completion_message{font-size: 60px;}
-        #completion_message2{color: #4CAF50; font-size: 30px;}
-        #completion_message3{color: #4CAF50; margin: 10px; font-size: 30px;}
-        textarea{width: 100px; border:none;}
-
-         /* 추가된 부분: 화면 너비에 따라 스타일 조정 */
-        @media screen and (max-width: 600px) {
-            h1 {font-size: 24px; /* 작은 화면에서 더 작은 글꼴 크기 */}
-            #total {font-size: 16px; /* 작은 화면에서 더 작은 글꼴 크기 */}
-            #video_name {font-size: 10px; /* 작은 화면에서 더 작은 글꼴 크기 */}
-            #completion_message {font-size: 36px; /* 작은 화면에서 더 작은 글꼴 크기 */}
-            button {font-size: 14px; /* 작은 화면에서 더 작은 버튼 글꼴 크기 */}
-        }
-
-        .form-elements{
-            display: flex;
-            flex-direction: column;
-            align-items: right;
-            justify-content: right;
-            text-align: right;
-        }
-
-        fieldset{
-            border: none;
-        }
-
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-
-    <script>
-        let result;
-        let finish_timer;
-        let next_video;
-        let check = false;
-        let cnt = 1;
-        let Previous = false;
-
-        let video_path;
-        let resultList = [];
-        let annotatorName = ''; // 주석자 이름을 저장할 변수
-        let finish = false
-        let prev_video; 
-        let currentVideo; // 현재 동영상을 저장하기 위한 변수
-        //===========check===============
-        let TOTAL_VIDEO_NUMBER = 4;
-        let folder = 'timer';
-        let PASSWORD = '0000'
-        // 초기에 프로그래스 바 표시
-        updateProgressBar();
-
-        //=================== 주석자 정보 입력 ====================
-        let password = prompt('공유 받은 비밀번호를 입력하시오.', '****')
-        password_check(password)
-
-        function password_check(password){
-            if(password != '0000' ){
-            alert('올바르지 않은 비밀번호입니다.');
-            password = prompt('공유 받은 비밀번호를 입력하시오.', '****')
-            password_check(password)
+            @media screen and (max-width: 600px) {
+                h1 {font-size: 24px;} #total {font-size: 16px;} #video_name {font-size: 10px;} #completion_message {font-size: 36px;} button {font-size: 14px;}
+                #logo-container {position: relative; padding: 10px;} #logo {width: 80px;} #title {font-size: 18px; margin-top: 10px;}
             }
-        }
+            
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 
-        while (!annotatorName) {
-            annotatorName = prompt('주석자 본인 이름을 입력하시오.', 'ex) 홍길동');
-        }
+        <script>
+            let result;
+            let finish_timer;
+            let next_video;
+            let check = false;
+            
+            let Previous = false;
+            let video_path;
+            let resultList = [];
+            let annotatorName = ''; // 주석자 이름을 저장할 변수
+            let finish = false
+            let prev_video; 
+            let currentVideo; // 현재 동영상을 저장하기 위한 변수
+            let count = 0;
+            //===========check===============
+            let TOTAL_VIDEO_NUMBER = 3;
+            let cnt = 1; //비디오 시작 넘버
+            let video_end = 3;
+            let folder = 'timer';
+            let PASSWORD = '0000'
         
-        alert('주석을 시작하시겠니까? \n\n주석이 완료되기 전까지, 웹브라우저를 종료하면 초기화되므로 유의하시기 바랍니다.')
-        //=================== 비디오 끝나면 팝업창으로 설문조사 ==================
-        function videoEnded(previous) {
-            clearTimeout(finish_timer);
-            finish_timer = setTimeout(function() {
-                let strings = '시청하신 영상에 대한 피험자의 "집중도"를 평가하시오.\n\n' +'    (1) 매우 낮음 (2) 낮음 (3) 높음 (4) 매우 높음 \n\n'
-                let inputResult = prompt(strings, 'ex) 4');
 
-                if (inputResult !== null) {
-                    // Prompt에서 취소 버튼을 누르지 않은 경우
-                    let result = inputResult;
-                    check = true;
-                    previous = false;
-                    Previous = previous;
+            
+            // 초기에 프로그래스 바 표시
+            updateProgressBar();
 
-                    if (result !== '1' && result !== '2' && result !== '3' && result !== '4') {
-                        alert('올바른 값을 입력하시오.');
-                        previous = true;
-                        Previous = previous;
-                    } else {
-                        // =========== 마지막 주석 완료 후 =====================
-                        if (cnt == TOTAL_VIDEO_NUMBER){
-                            showCompletionMessage();
-                            const email_send = document.getElementById('email')
-                            email_send.style.display = "block"
-                            finish = true
-                           
-                        }
+            //=================== 주석자 정보 입력 ====================
+            let password = prompt('공유 받은 비밀번호를 입력하시오.', '****')
+            password_check(password)
 
-                        updateProgressBar();
-                        cnt++;
-                        next_video = ".\\" + folder + '\\' + cnt + ".mp4";
-                        //next_video = ".\\LHS\\A\\" + cnt + ".mp4"
+            function password_check(password){
+                if(password != '0000' ){
+                alert('올바르지 않은 비밀번호입니다.');
+                password = prompt('공유 받은 비밀번호를 입력하시오.', '****')
+                password_check(password)
+                }  
+            }
 
-                        // 엑셀 파일 추가 데이터
-                        //subject = video_path.substring(2,7) <------------수정 피험자로
-                        subject = 'subject'
+            while (!annotatorName) {
+                annotatorName = prompt('주석자 본인 이름을 입력하시오.', 'ex) 홍길동');
+            }
+            
+            alert('주석을 시작하시겠니까? \n\n주석이 완료되기 전까지, 웹브라우저를 종료하면 초기화되므로 유의하시기 바랍니다.')
 
-                        video_name = video_path.substring(8,)
-                        const currentTime = new Date().toLocaleString();
-                        
-                        resultList.push({ subject_name: subject, video: video_name, concentration: result, time: currentTime });
-                        const total = document.getElementById("total");
-                        total.textContent = '주석 진행 상황 : ' + resultList.length + '/' + TOTAL_VIDEO_NUMBER
 
-                        if(finish == true){
-                            // 이메일 전송 데이터
-                            const Subject = document.getElementById('Subject')
-                            const Video = document.getElementById('Video')
-                            const Concentration = document.getElementById('Concentration')
-                            const Time = document.getElementById('Time')                            
 
-                            for (const item of resultList) {
-                                Subject.textContent += item.subject_name+'\n';
-                                Video.textContent += item.video+'\n'
-                                Concentration.textContent += item.concentration+'\n';
-                                Time.textContent += item.time+'\n';
-                            }
+            //=================== 라디오 버튼 제출 ====================
+            function submitRadio() {
+                count++;
+                const radioButtons_list = document.getElementsByName('level');
+                let result = null;
+
+                radioButtons_list.forEach((node) => {
+                    if(node.checked)  {
+                        result = node.value;
+                    }
+                }) 
+                console.log(result)
+                if (result !== null) {// 라디오 버튼 선택된 경우
+
+                    const radioContainer = document.getElementById('radio_container');
+                    radioContainer.style.display = "none";
+                    const replayButton2 = document.getElementById('replay2');
+                    replayButton2.style.display = "none";
+                    const replayButton = document.getElementById('replay');
+                    replayButton.style.display = "block";
+                    const video = document.getElementById('video');
+                    video.style.display = "block";
+                    const footer_ = document.getElementById('footer');
+                    footer_.style.display="none";
+
+                    // 주석이 완료되면 메시지를 표시
+                    if (count == TOTAL_VIDEO_NUMBER){
+                        showCompletionMessage();
+                        const email_send = document.getElementById('email')
+                        email_send.style.display = "block"
+                        finish = true
+                        const main = document.getElementById('main')
+                        main.style.backgroundColor = "white";
+                    }
+                    // 라디오 버튼 초기화
+                    resetRadioButtons();
+                    // replayVideo();
+                    
+                    updateProgressBar();
+                    cnt++;
+
+                    next_video = ".\\" + folder + '\\' + cnt + ".mp4";
+                    subject = folder
+                    
+                    // 엑셀 파일에 데이터 추가
+                    const currentTime = new Date().toLocaleString();
+                    resultList.push({ subject_name: subject, video: video_path.substring(8), concentration: result, time: currentTime });
+                    const total = document.getElementById("total");
+                    total.textContent = '주석 진행 상황 : ' + resultList.length + '/' + TOTAL_VIDEO_NUMBER
+                    
+                    if(finish == true){
+                        // 이메일 전송 데이터
+                        const Subject = document.getElementById('Subject')
+                        const Video = document.getElementById('Video')
+                        const Concentration = document.getElementById('Concentration')
+                        const Time = document.getElementById('Time')                            
+
+                        for (const item of resultList) {
+                            Subject.textContent += item.subject_name+'\n';
+                            Video.textContent += item.video+'\n'
+                            Concentration.textContent += item.concentration+'\n';
+                            Time.textContent += item.time+'\n';
                         }
                     }
                     addVideo();
-                }else{replayVideo()}
-            }, 500);
-        }
+                } else {
+                    alert('집중도를 선택하시오')
+                }
+            }
 
-        //================== 다음 동영상 ===================
-        function addVideo() {
-            const video = document.createElement("video");
-            video.autoplay = true;
-            video.muted = true; // 음소거 설정
-            currentVideo = video; // 현재 동영상 저장
-           
-            if (check == true && Previous == false){
-                video.src = next_video;
-                prev_video = video.src;
-                video_path = next_video;
-
-            } else if(check != true && Previous == false){
-                video.src = ".\\" + folder + '\\' + cnt + ".mp4";
-                prev_video = ".\\" + folder + '\\' + cnt + ".mp4";
-                video_path = ".\\" + folder + '\\' + cnt + ".mp4";
-
-                //video.src = ".\\LHS\\A\\" + 1 + ".mp4";
-                //prev_video= ".\\LHS\\A\\" + 1 + ".mp4";
-                //video_path = ".\\LHS\\A\\" + 1 + ".mp4";
-            
-            } else if(check == true && Previous == true){
-                video.src = prev_video;
+            // 라디오 버튼 초기화 함수
+            function resetRadioButtons() {
+                const radioButtons = document.querySelectorAll('input[name="level"]');
+                for (const radioButton of radioButtons) {
+                    radioButton.checked = false;
+                }
             }
             
-            //---------- html div 본래 아이템 삭제하고-----------------
-            const videoContainer = document.getElementById("video");
-            while (videoContainer.firstChild) {
-                videoContainer.removeChild(videoContainer.firstChild);
+            //=================== 비디오 끝나면  설문조사 ==================
+            function videoEnded(previous) {
+                clearTimeout(finish_timer);
+                const footer_ = document.getElementById('footer');
+                footer_.style.display="block";
+                const radio_container = document.getElementById('radio_container')
+                radio_container.style.display = "block";
+                const replayButton2 = document.getElementById('replay2');
+                replayButton2.style.display = "block";
+                const video = document.getElementById('video')
+                video.style.display = "none";
+                const replayButton = document.getElementById('replay');
+                replayButton.style.display = "none";
+               
             }
-            videoContainer.appendChild(video);
-            //-------------------------------------------------------
 
-            video.onended = videoEnded;
+            //================== 다음 동영상 ===================
+            function addVideo() {
+                const videoContainer = document.getElementById("video");
+                videoContainer.innerHTML = ''; // 기존 비디오 삭제
 
-            const videoNameElement = document.getElementById('video_name');
-            videoNameElement.textContent = '현재 동영상 경로: ' + video.src;
+                const video = document.createElement("video");
+                video.autoplay = true;
+                video.muted = true;
+                video.controls = false; // 동영상 컨트롤러 비활성화
+                video.addEventListener('ended', () => videoEnded(false)); // 비디오 재생이 끝났을 때 호출
 
-            const results = document.getElementById('result_list');
-            results.innerHTML = ''; // 이전 결과 초기화
-            for (const item of resultList) {
-                results.innerHTML += `[피험자: ${item.subject_name}, 동영상: ${item.video}] 집중도: ${item.concentration}, 시간: ${item.time}<br>`;
-            }
-        }
+                // 추가: 현재 재생 중인 동영상을 일시 중지
+                if (currentVideo) {
+                    currentVideo.pause();
+                }
 
-
-        //========================= 동영상 리플레이 =======================
-        function replayVideo() {
-            if (currentVideo) {
-                currentVideo.currentTime = 0; // 현재 동영상을 처음부터 재생
-                currentVideo.play();
-            }
-        }
-      
-       //================ 함수 실행 시 프로그래스 바 업데이트 =================
-        function updateProgressBar() {
-            const progressBar = document.getElementById("progress_fill");
-            if (progressBar) {
-                const progressPercentage = (cnt / TOTAL_VIDEO_NUMBER) * 100;
-                progressBar.style.width = progressPercentage + "%";
-            }
-        }
-
-        // ==================== 엑셀 파일 저장 ====================
-        function saveToExcel(resultList) {
-            const data = resultList.map(item => [item.subject_name, item.video, item.concentration, item.time]);
-
-            const fileName = `주석결과_${annotatorName}.xlsx`;
-
-            const ws = XLSX.utils.aoa_to_sheet([['피험자', '동영상', '집중도', '시간']]);
-            XLSX.utils.sheet_add_aoa(ws, data, { origin: -1 });
-
-            // 워크시트 보호 설정 (선택사항)
-            const protectionOptions = {
-                selectLockedCells: true,
-                selectUnlockedCells: true,
-            };
-            ws['!protect'] = protectionOptions;
-
-            // 워크북 생성
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Survey Data");
-
-            // 암호 설정
-            const passwordOptions = { password: 'your_password_here' }; // 암호를 설정하려면 여기에 원하는 암호를 넣으세요.
-            XLSX.writeFile(wb, fileName, passwordOptions);
-        }
-
-       
-        // =====================주석이 완료되면 메시지========================
-        function showCompletionMessage() {
-            const completionMessage = document.getElementById("completion_message");
-            completionMessage.textContent = "주석 작성이 완료되었습니다.";
-            completionMessage.style.display = "block";
-
-            const completionMessage2 = document.getElementById("completion_message2");
-            completionMessage2.textContent = "이메일 보내기를 클릭하여 최종 주석 결과를 제출해 주세요.";
-            completionMessage2.style.display = "block";
-
-            const completionMessage3 = document.getElementById("completion_message3");
-            completionMessage3.textContent = "참여해 주셔서 감사합니다.";
-            completionMessage3.style.display = "block";
-
-            const blank = document.getElementById("blank");
-            completionMessage3.style.display = "block";
-
-            // 다른 요소 숨김
-            const progressBar = document.getElementById("progress_bar");
-            progressBar.style.display = "none";
-            const video_name_ = document.getElementById("video_name");
-            video_name_.style.display = "none";
-            const replay = document.getElementById('replay')
-            replay.style.display = "none";
-            const video_ = document.getElementById("video");
-            video_.style.display = "none";
-            const title = document.getElementById('title');
-            title.style.display = 'none'
-            const total = document.getElementById('total');
-            total.style.display = 'none'
-
-           
-            // 엑셀 파일 저장 버튼을 표시
-            // const saveButton = document.getElementById('save_button');
-            // saveButton.style.display = "block";
-        }
-
-        window.onload = addVideo;
-
-    </script>
-</head>
-<body>
-    <h1 id="title">GT_수집 집중도 평가</h1><br>
-    <strong><p id="total">주석 진행 상황 : 0/4 </p></strong>
-    <div id="progress_bar_container">
-        <div id="progress_bar">
-            <div id="progress_fill"></div>
-        </div>
-    </div>
-    <p id ='blank' style="display: none;"></p>
-    <strong><h1 id="completion_message"  style="display: none;"></h1></strong>
-    <p id="completion_message2"  style="display: none;"></p>
-    <p id="completion_message3"  style="display: none;"></p>
-    <button id="save_button" style="display: none;" onclick="saveToExcel(resultList)">이메일 보내기</button>
-
-    <p id="video_name"></p> 
-    <div id="video"></div>
-    <button id ='replay' onclick="replayVideo()">동영상 다시보기</button><br><br>
-    
-   
-    <!--============================ 이메일 보내기 ============================-->
-    <form id="email" class="gform pure-form pure-form-stacked" method="POST" data-email="example@email.net" style="display: none;"
-    action="https://script.google.com/macros/s/AKfycbw2PSI8kDT_--UEgE2Ae1wEwgj981CTgUW3B0y5cArv-2TRtCPesncJFnMz2wHNZmi4/exec">
-      <!-- change the form action to your script url -->
-
-        <div class="form-elements">
-            <fieldset class="pure-group">
-                <label for="email"> 이메일 주소:</label>
-                <input id="Email" name="Email" type="Email" value=""
-                required placeholder="your.name@email.com"/>
-            </fieldset>
-
-            <fieldset class="pure-group">
-                <label for="Name">이름: </label>
-                <input id="Name" name="Name" placeholder="홍길동" />
-            </fieldset>
-    
-            <fieldset class="pure-group" style="display: none;">
-                <label style="display: none;" for="Subject">피험자 </label>
-                <textarea id="Subject" name="Subject" rows="10"  style="display: none;"
-                placeholder=""></textarea>
-            </fieldset>
-
-            <fieldset class="pure-group" style="display: none;">
-                <label style="display: none;" for="Video">동영상 </label> 
-                <textarea id="Video" name="Video" rows="10" style="display: none;"
-                placeholder=""></textarea>
-            </fieldset>
+                if (check === true && Previous === false) { 
+                    video.src = next_video;
+                    prev_video = video.src;
+                    video_path = next_video;
+                } else if (check !== true && Previous === false) {
+                    video.src = ".\\" + folder + '\\' + cnt + ".mp4";
+                    prev_video = ".\\" + folder + '\\' + cnt + ".mp4";
+                    video_path = ".\\" + folder + '\\' + cnt + ".mp4";
      
-            <fieldset class="pure-group" style="display: none;">
-                <label style="display: none;" for="Concentration">집중도 </label>
-                <textarea id="Concentration" name="Concentration" rows="10" style="display: none;" 
-                placeholder=""></textarea>
-            </fieldset>
+                } else if (check === true && Previous === true) {
+                    video.src = prev_video;
+                }
+                videoContainer.appendChild(video);
+                currentVideo = video; // 현재 동영상 업데이트
 
-            <fieldset class="pure-group" style="display: none;">
-                <label style="display: none;" for="Time">시간 </label>
-                <textarea id="Time" name="Time_check" rows="10"  style="display: none;"
-                placeholder=""></textarea>
-            </fieldset>
-        
-            <fieldset class="pure-group honeypot-field" style="display: none;">
-                <label for="honeypot">To help avoid spam, utilize a Honeypot technique with a hidden text field; must be empty to submit the form! Otherwise, we assume the user is a spam bot.</label>
-                <input id="honeypot" type="text" name="honeypot" value="" />
-            </fieldset>
-    
-            <button><i class="fa fa-paper-plane"></i>&nbsp;이메일 보내기</button>
-        </div>
-    
-        <!-- Customise the Thankyou Message People See when they submit the form: -->
-        <div class="thankyou_message" style="display:none;">
-            <h2><em>Thanks</em> for contacting us!
-            We will get back to you soon!</h2>
-        </div>
-  
-    </form>
-  
-    <!-- Submit the Form to Google Using "AJAX" -->
-    <script data-cfasync="false" src="form-submission-handler.js"></script>
-  <!-- END -->
-  
-  <hr width = "100%" color = "gray" size = "0.5">
-  <h2>주석 결과</h2>
-  <p id="result_list"></p>
+                // 비디오 이름 업데이트
+                const videoNameElement = document.getElementById('video_name');
+                videoNameElement.textContent = '현재 동영상 경로: ' + video.src;
 
+                const results = document.getElementById('result_list');
+                results.innerHTML = ''; // 이전 결과 초기화
+                for (const item of resultList) {
+                    results.innerHTML += `[피험자: ${item.subject_name}, 동영상: ${item.video}] 집중도: ${item.concentration}, 시간: ${item.time}<br>`;
+                }
+            }
 
-</body>
+            //========================= 동영상 리플레이 =======================
+            function replayVideo() {
+                const footer_ = document.getElementById('footer');
+                footer_.style.display="none";
+                if (currentVideo) {
+                    // 현재 동영상이 재생 중이 아니라면 재생 시작
+                    if (currentVideo.paused) {
+                        currentVideo.play();
+                    } else {
+                        // 현재 동영상이 이미 재생 중이라면 일시 중지된 상태에서 다시 재생
+                        currentVideo.currentTime = 0;
+                    }
+                }
+            }
+
+            function replayVideo2() {
+                const footer_ = document.getElementById('footer');
+                footer_.style.display="none";
+                const radio_container = document.getElementById('radio_container')
+                radio_container.style.display = "none";
+                const replayButton2 = document.getElementById('replay2');
+                replayButton2.style.display = "none";
+                const video = document.getElementById('video')
+                video.style.display = "block";
+                const replayButton = document.getElementById('replay');
+                replayButton.style.display = "block";
+
+                if (currentVideo) {
+                    // 현재 동영상이 재생 중이 아니라면 재생 시작
+                    if (currentVideo.paused) {
+                        currentVideo.play();
+                    } else {
+                        // 현재 동영상이 이미 재생 중이라면 일시 중지된 상태에서 다시 재생
+                        currentVideo.currentTime = 0;
+                    }
+                }
+
+                const radioButtons_list = document.getElementsByName('level');
+                let result = null;
+
+                radioButtons_list.forEach((node) => {
+                    if(node.checked)  {
+                        result = node.value;
+                    }
+                }) 
+                console.log(result)
+                if (result !== null) {// 라디오 버튼 선택된 경우
+                    resetRadioButtons()
+                }
+            }
+
+        //================ 함수 실행 시 프로그래스 바 업데이트 =================
+            function updateProgressBar() {
+                const progressBar = document.getElementById("progress_fill");
+                if (progressBar) {
+                    const progressPercentage = (count / TOTAL_VIDEO_NUMBER) * 100;
+                    progressBar.style.width = progressPercentage + "%";
+                }
+            }
+
+            // ==================== 엑셀 파일 저장 ====================
+            function saveToExcel(resultList) {
+                const data = resultList.map(item => [item.subject_name, item.video, item.concentration, item.time]);
+
+                const fileName = `주석결과_${annotatorName}.xlsx`;
+
+                const ws = XLSX.utils.aoa_to_sheet([['피험자', '동영상', '집중도', '시간']]);
+                XLSX.utils.sheet_add_aoa(ws, data, { origin: -1 });
+
+                // 워크시트 보호 설정 (선택사항)
+                const protectionOptions = {
+                    selectLockedCells: true,
+                    selectUnlockedCells: true,
+                };
+                ws['!protect'] = protectionOptions;
+
+                // 워크북 생성
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Survey Data");
+
+                // 암호 설정
+                const passwordOptions = { password: '0000' }; // 암호를 설정하려면 여기에 원하는 암호를 넣으세요.
+                XLSX.writeFile(wb, fileName, passwordOptions);
+            }
+
+            // =====================주석이 완료되면 메시지========================
+            function showCompletionMessage() {
+                const completionMessage = document.getElementById("completion_message");
+                completionMessage.textContent = "주석 작성이 완료되었습니다.";
+                completionMessage.style.display = "block";
+
+                const completionMessage2 = document.getElementById("completion_message2");
+                completionMessage2.textContent = "이메일 보내기를 클릭하여 최종 주석 결과를 제출해 주세요.";
+                completionMessage2.style.display = "block";
+
+                const completionMessage3 = document.getElementById("completion_message3");
+                completionMessage3.textContent = "참여해 주셔서 감사합니다.";
+                completionMessage3.style.display = "block";
+
+                // const save_button = document.getElementById('save_button');
+                // save_button.style.display = "block";
+
+                // 다른 요소 숨김
+                const progressBar = document.getElementById("progress_bar");
+                progressBar.style.display = "none";
+                const video_name_ = document.getElementById("video_name");
+                video_name_.style.display = "none";
+                const replay = document.getElementById('replay')
+                replay.style.display = "none";
+                const replay2 = document.getElementById('replay2')
+                replay2.style.display = "none";
+                const video_ = document.getElementById("video");
+                video_.style.display = "none";
+                const title = document.getElementById('title');
+                title.style.display = 'none'
+                const total = document.getElementById('total');
+                total.style.display = 'none'
+
+                // 엑셀 파일 저장 버튼을 표시
+                // const saveButton = document.getElementById('save_button');
+                // saveButton.style.display = "block";
+            }
+
+            window.onload = addVideo;
+        </script>
+    </head>
+    <body>
+        <header>
+            <div id="logo-container">
+                <img id="logo" src="logo.jpg" alt="dongguk logo">
+            </div>
+            <h1 id="title">GT 수집 집중도 평가</h1><br>
+            <strong><p id="total">주석 진행상황: </p></strong>
+            <div id="progress_bar_container">
+                <div id="progress_bar">
+                    <div id="progress_fill"></div>
+                </div>
+            </div>
+            <!-- <p id ='blank' style="display: none;"></p> -->
+            <strong><h1 id="completion_message"  style="display: none;"></h1></strong>
+            <p id="completion_message2"  style="display: none;"></p>
+            <p id="completion_message3"  style="display: none;"></p>
+            <p id="video_name"></p> 
+        </header>
+        <main id="main">
+            <div id="video"></div>
+            <div id="radio_container" style="display: none;">
+                <p id="radio_title">집중도를 선택하세요</p><br>
+                <p></p>
+                <input type="radio" id="select1" name="level" value="0"><label for="select1"> 매우 낮음</label><br>
+                <input type="radio" id="select2" name="level" value="1"> <label for="select2">낮음</label><br>
+                <input type="radio" id="select3" name="level" value="2"> <label for="select3">높음</label><br>
+                <input type="radio" id="select4" name="level" value="3"> <label for="select4">매우 높음</label><br>
+                <button id="radio_btn" onclick="submitRadio()">확인</button>
+                <button id ='replay2' onclick="replayVideo2()" >동영상 다시보기</button><br><br>
+            </div>
+            <div id="replay_btn">
+                <button id ='replay' onclick="replayVideo()" >동영상 처음부터 재생</button><br><br>
+                <div></div>
+            </div>
+            <!--============================ 이메일 보내기 ============================-->
+            <form id="email" class="gform pure-form pure-form-stacked" method="POST" data-email="example@email.net" style="display: none;"
+            action="https://script.google.com/macros/s/AKfycbzApAhZYSlpklKIEQJI0dW0-YvoJfpG7-ujMtBSis3l3yAMIVxIW0F2XmXsF1TbogSB/exec">
+            <!-- change the form action to your script url -->
+                <div class="form-elements">
+                    <fieldset class="pure-group">
+                        <br><br><br>
+                        <label for="email"> 이메일 주소:</label>
+                        <input id="Email" name="Email" type="Email" value=""
+                        required placeholder="your.name@email.com"/>
+                    </fieldset>
+                    <fieldset class="pure-group">
+                        <label for="Name">이름: </label>
+                        <input id="Name" name="Name" placeholder="홍길동" />
+                    </fieldset>
+                    <fieldset class="pure-group" style="display: none;">
+                        <label style="display: none;" for="Subject">피험자 </label>
+                        <textarea id="Subject" name="Subject" rows="10"  style="display: none;"
+                        placeholder=""></textarea>
+                    </fieldset>
+                    <fieldset class="pure-group" style="display: none;">
+                        <label style="display: none;" for="Video">동영상 </label> 
+                        <textarea id="Video" name="Video" rows="10" style="display: none;"
+                        placeholder=""></textarea>
+                    </fieldset>         
+                    <fieldset class="pure-group" style="display: none;">
+                        <label style="display: none;" for="Concentration">집중도 </label>
+                        <textarea id="Concentration" name="Concentration" rows="10" style="display: none;" 
+                        placeholder=""></textarea>
+                    </fieldset>
+                    <fieldset class="pure-group" style="display: none;">
+                        <label style="display: none;" for="Time">시간 </label>
+                        <textarea id="Time" name="Time_check" rows="10"  style="display: none;"
+                        placeholder=""></textarea>
+                    </fieldset>               
+                    <fieldset class="pure-group honeypot-field" style="display: none;">
+                        <label for="honeypot">To help avoid spam, utilize a Honeypot technique with a hidden text field; must be empty to submit the form! Otherwise, we assume the user is a spam bot.</label>
+                        <input id="honeypot" type="text" name="honeypot" value="" />
+                    </fieldset>
+                    <br><br>
+                    <button><i class="fa fa-paper-plane"></i>&nbsp;이메일 보내기</button>
+                    <!-- <br><br><br><br><br> -->
+                </div>           
+                <!-- Customise the Thankyou Message People See when they submit the form: -->
+                <div class="thankyou_message" style="display:none;">
+                    <h2><em>Thanks</em> for contacting us!
+                    We will get back to you soon!</h2>
+                </div>
+            </form>        
+            <!-- Submit the Form to Google Using "AJAX" -->
+            <script data-cfasync="false" src="form-submission-handler.js"></script>
+            <!-- <button id="save_button" style="display: none;" onclick="saveToExcel(resultList)">엑셀파일저장</button> -->
+            <br><br><br><br><br>
+        <!-- END -->
+        </main>
+        <footer id="footer" style="display: none;">
+            <h2 id="result_title" >주석 결과</h2>
+            <p id="result_list"></p>
+        </footer>
+    </body>
 </html>
